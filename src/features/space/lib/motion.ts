@@ -11,8 +11,17 @@ export function constrain(p: Point): Point {
   }
   return q;
 }
-export function approach(p: Point, target: Point, dt: number): Point {
-  if (blocked(p, target)) {
+export function approach(
+  p: Point,
+  target: Point,
+  dt: number,
+  room?: {
+    constrain: (p: Point) => Point;
+    blocked?: (a: Point, b: Point) => boolean;
+  },
+): Point {
+  const confine = room?.constrain ?? constrain;
+  if ((room?.blocked ?? blocked)(p, target)) {
     const corners = [{x:-1.5,z:-1.65},{x:1.5,z:-1.65},{x:-1.5,z:1.05},{x:1.5,z:1.05}];
     const nodes = [p, ...corners, target];
     const costs = nodes.map(()=>Infinity); costs[0]=0;
@@ -34,7 +43,7 @@ export function approach(p: Point, target: Point, dt: number): Point {
   const d = distance(p, target);
   if (d < 0.04) return p;
   const k = Math.min(d, dt * 2.5) / d;
-  return constrain({
+  return confine({
     x: p.x + (target.x - p.x) * k,
     z: p.z + (target.z - p.z) * k,
   });
@@ -43,7 +52,7 @@ export function viewingPoint(p: Point, facing: number): Point {
   return { x: p.x + Math.sin(facing) * 2, z: p.z + Math.cos(facing) * 2 };
 }
 
-function blocked(a:Point,b:Point):boolean {
+export function blocked(a:Point,b:Point):boolean {
   for(let i=0;i<=80;i++) {const t=i/80;const x=a.x+(b.x-a.x)*t,z=a.z+(b.z-a.z)*t;
     if(Math.abs(x)<1.3&&z>-1.45&&z<.85)return true;
   }

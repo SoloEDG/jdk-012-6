@@ -15,6 +15,7 @@ import { ArtworkList, ArtworkDetail } from "../features/catalog";
 import { TourPanel } from "../features/tours";
 import { AudioPlayer } from "../features/narration";
 import { CollectionPanel } from "../features/collection";
+import { StudyRoom } from "../features/study";
 import { artworks, artworkById } from "../shared/catalog";
 import { useGallery } from "./useGallery";
 export default function App() {
@@ -24,6 +25,52 @@ export default function App() {
   const [help, setHelp] = useState(false);
   const [side, setSide] = useState("works");
   const a = artworkById(g.catalog.active);
+
+  const openStudy = () => {
+    g.study.seed();
+    g.enterStudy();
+  };
+
+  if (g.inStudy) {
+    return (
+      <div className="app study-mode">
+        {g.study.ids.length < 2 ? (
+          <div className="modal-backdrop">
+            <div className="modal" role="dialog" aria-modal="true">
+              <div className="eyebrow">COMPARATIVE STUDY</div>
+              <h2>先收藏两件作品。</h2>
+              <p>
+                并置研究从收藏中选取两到四件作品，保持原作尺寸与观看距离。
+                目前收藏数量不足。
+              </p>
+              <button className="primary" onClick={g.exitStudy}>
+                返回主展厅
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            {g.collection.storageError && (
+              <div className="storage-error">
+                浏览器存储已满，本次更改暂未保存，请下载回顾。
+              </div>
+            )}
+            <main>
+              <StudyRoom
+                study={g.study}
+                tourPaused={
+                  g.tour.state.phase === "paused" && g.tour.state.routeId
+                    ? { step: g.tour.state.step }
+                    : null
+                }
+                onLeave={g.exitStudy}
+              />
+            </main>
+          </>
+        )}
+      </div>
+    );
+  }
   return (
     <div className="app">
       <header>
@@ -54,6 +101,19 @@ export default function App() {
             <span className="count">
               {g.collection.document.favorites.length}
             </span>
+          </button>
+          <button
+            className="study-entry"
+            onClick={openStudy}
+            disabled={g.collection.document.favorites.length < 2}
+            title="从收藏中选取两到四件作品并置研究"
+          >
+            并置研究
+            {g.collection.document.studyIds.length > 0 && (
+              <span className="count">
+                {g.collection.document.studyIds.length}
+              </span>
+            )}
           </button>
         </nav>
         <div className="header-meta">
@@ -102,12 +162,12 @@ export default function App() {
             </button>
           </div>
           {side === "works" ? (
-            <ArtworkList active={g.catalog.active} onSelect={g.go} />
+            <ArtworkList active={g.catalog.active} onSelect={g.goTo} />
           ) : (
             <Map
               position={g.walker.position}
               active={g.catalog.active}
-              onSelect={g.go}
+              onSelect={g.goTo}
               large
             />
           )}
@@ -115,7 +175,7 @@ export default function App() {
             state={g.tour.state}
             onStart={g.tour.start}
             onPause={g.pauseTour}
-            onResume={g.tour.resume}
+            onResume={g.resumeTour}
             onStop={g.stopTour}
             onNext={g.nextTour}
           />
@@ -141,7 +201,7 @@ export default function App() {
             <Viewport
               position={g.walker.positionRef}
               yaw={g.walker.yaw}
-              onSelect={g.go}
+              onSelect={g.goTo}
             />
             <div className="scene-top">
               <span>
@@ -185,7 +245,7 @@ export default function App() {
               <Map
                 position={g.walker.position}
                 active={g.catalog.active}
-                onSelect={g.go}
+                onSelect={g.goTo}
               />
             </div>
             <div className="scene-controls">
@@ -228,7 +288,7 @@ export default function App() {
           </div>
           <div className="art-tags">
             {artworks.slice(0, 3).map((art, i) => (
-              <button key={art.id} onClick={() => g.go(art.id)}>
+              <button key={art.id} onClick={() => g.goTo(art.id)}>
                 <span style={{ background: art.color }} />0{i + 1} · {art.title}
                 <ArrowUpRight size={14} />
               </button>
@@ -239,9 +299,16 @@ export default function App() {
           {tab === "collection" ? (
             <CollectionPanel
               document={g.collection.document}
-              onSelect={g.go}
+              onSelect={g.goTo}
               onNote={g.collection.note}
               onToggle={g.collection.toggle}
+              onStudy={() => {
+                openStudy();
+              }}
+              onStudyWith={(id) => {
+                g.study.startWith(id);
+                g.enterStudy();
+              }}
             />
           ) : tab === "journeys" ? (
             <>
@@ -254,7 +321,7 @@ export default function App() {
                 state={g.tour.state}
                 onStart={g.tour.start}
                 onPause={g.pauseTour}
-                onResume={g.tour.resume}
+                onResume={g.resumeTour}
                 onStop={g.stopTour}
                 onNext={g.nextTour}
               />
@@ -272,7 +339,12 @@ export default function App() {
                 if (g.catalog.active) g.narration.play(g.catalog.active);
               }}
               onGo={() => {
-                if (g.catalog.active) g.go(g.catalog.active);
+                if (g.catalog.active) g.goTo(g.catalog.active);
+              }}
+              onCompare={() => {
+                if (!g.catalog.active) return;
+                g.study.startWith(g.catalog.active);
+                g.enterStudy();
               }}
             />
           )}
@@ -345,7 +417,7 @@ export default function App() {
                 position={g.walker.position}
                 active={g.catalog.active}
                 onSelect={(id) => {
-                  g.go(id);
+                  g.goTo(id);
                   setMapOpen(false);
                 }}
                 large

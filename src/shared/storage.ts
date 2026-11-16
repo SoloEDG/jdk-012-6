@@ -4,6 +4,8 @@ export const emptyDocument = (): GalleryDocument => ({
   favorites: [],
   visits: [],
   notes: {},
+  comparisons: [],
+  studyIds: [],
 });
 export function loadDocument(): GalleryDocument {
   try {
@@ -20,6 +22,18 @@ export function loadDocument(): GalleryDocument {
           )
         : [],
       notes: typeof d.notes === "object" && d.notes ? d.notes : {},
+      comparisons: Array.isArray(d.comparisons)
+        ? d.comparisons.filter(
+            (c: { ids?: unknown; note?: unknown }) =>
+              Array.isArray(c.ids) &&
+              c.ids.length >= 2 &&
+              c.ids.every((id: unknown) => typeof id === "string") &&
+              typeof c.note === "string",
+          )
+        : [],
+      studyIds: Array.isArray(d.studyIds)
+        ? d.studyIds.filter((id: unknown) => typeof id === "string")
+        : [],
     };
   } catch {
     return emptyDocument();

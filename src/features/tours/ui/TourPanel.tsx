@@ -38,7 +38,12 @@ export function TourPanel({
           <p>
             {state.phase === "done"
               ? "这段旅程已完成，收藏你的所见。"
-              : `${state.phase === "walking" ? "正在前往" : state.phase === "paused" ? "导览已暂停" : "正在讲解"} · ${artworkById(current.stops[state.step])?.title}`}
+              : `${state.phase === "walking" ? "正在前往" : state.phase === "paused" ? "导览已暂停并保留位置" : "正在讲解"} · ${artworkById(current.stops[state.step])?.title}`}
+            {state.phase === "paused" && (
+              <span className="tour-checkpoint">
+                {" · "}第 {state.step + 1} / {current.stops.length} 站
+              </span>
+            )}
           </p>
           <div className="tour-controls">
             {state.phase !== "done" && (

@@ -3,6 +3,7 @@ import type { AudioState } from "../../../shared/types";
 import { artworkById } from "../../../shared/catalog";
 import { captionAt } from "../lib/timeline";
 import { speak, stopSpeech } from "../lib/speech";
+
 export function useNarration(onEnd: () => void) {
   const [state, setState] = useState<AudioState>({
     artworkId: null,
@@ -12,6 +13,7 @@ export function useNarration(onEnd: () => void) {
   });
   const callback = useRef(onEnd);
   callback.current = onEnd;
+  const stopAt = useRef<number | null>(null);
   const [supported, setSupported] = useState(true);
   useEffect(() => {
     if (!state.playing) return;
@@ -32,7 +34,16 @@ export function useNarration(onEnd: () => void) {
     return stopSpeech;
   }, [caption, state.playing, state.rate]);
   useEffect(() => {
-    if (a && state.playing && state.elapsed >= a.duration) {
+    if (!a || !state.playing) return;
+    if (stopAt.current !== null && state.elapsed >= stopAt.current) {
+      const end = stopAt.current;
+      stopAt.current = null;
+      setState((s) => ({ ...s, playing: false, elapsed: end }));
+      // A bounded segment is finished: let the caller chain the next one.
+      callback.current();
+      return;
+    }
+    if (state.elapsed >= a.duration) {
       setState((s) => ({ ...s, playing: false, elapsed: a.duration }));
       callback.current();
     }
@@ -41,7 +52,8 @@ export function useNarration(onEnd: () => void) {
     state,
     caption,
     supported,
-    play: (id: string) =>
+    play: (id: string) => {
+      stopAt.current = null;
       setState((s) => ({
         ...s,
         artworkId: id,
@@ -50,10 +62,27 @@ export function useNarration(onEnd: () => void) {
             ? s.elapsed
             : 0,
         playing: true,
-      })),
-    pause: () => setState((s) => ({ ...s, playing: false })),
+      }));
+    },
+    /** Plays a single transcript segment, then stops at its boundary. */
+    playRange: (id: string, start: number, end: number) => {
+      stopAt.current = end;
+      setState((s) => ({
+        ...s,
+        artworkId: id,
+        elapsed: Math.max(0, start),
+        playing: true,
+      }));
+    },
+    pause: () => {
+      stopAt.current = null;
+      setState((s) => ({ ...s, playing: false }));
+    },
     toggle: () => setState((s) => ({ ...s, playing: !s.playing })),
-    seek: (elapsed: number) => setState((s) => ({ ...s, elapsed })),
+    seek: (elapsed: number) => {
+      stopAt.current = null;
+      setState((s) => ({ ...s, elapsed }));
+    },
     rate: (rate: number) => setState((s) => ({ ...s, rate })),
   };
 }

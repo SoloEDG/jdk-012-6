@@ -53,15 +53,22 @@ export function buildScene() {
   const frames: THREE.Mesh[] = [];
   for (const a of artworks) {
     const group = new THREE.Group();
-    group.position.set(a.position.x, 2.45, a.position.z);
+    // Displayed at the same 1:1 scale as the study room so a work never
+    // appears larger or smaller when the two spaces are compared.
+    const height = a.size.height / 100;
+    const width = a.size.width / 100;
+    // Museum centre line, so the eye meets the middle of every work and the
+    // 1:1 sizes read correctly against the room and each other.
+    const centerY = 1.5;
+    group.position.set(a.position.x, centerY, a.position.z);
     group.rotation.y = a.facing;
     const frame = new THREE.Mesh(
-      new THREE.BoxGeometry(2.3, 2.9, 0.12),
+      new THREE.BoxGeometry(width + 0.17, height + 0.17, 0.12),
       new THREE.MeshStandardMaterial({ color: "#423e35" }),
     );
     group.add(frame);
     const image = new THREE.Mesh(
-      new THREE.PlaneGeometry(2.13, 2.73),
+      new THREE.PlaneGeometry(width, height),
       new THREE.MeshBasicMaterial({ map: artTexture(a) }),
     );
     image.position.z = 0.07;
@@ -72,7 +79,7 @@ export function buildScene() {
       new THREE.PlaneGeometry(0.6, 0.13),
       new THREE.MeshBasicMaterial({ color: "#f2eee3" }),
     );
-    plaque.position.set(0.7, -1.66, 0.08);
+    plaque.position.set(0.7, -height / 2 - 0.24, 0.08);
     group.add(plaque);
     scene.add(group);
   }

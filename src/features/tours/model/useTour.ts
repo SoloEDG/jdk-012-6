@@ -21,11 +21,29 @@ export function useTour() {
         const r = tourRoute(t);
         if (!r) return t;
         return t.step + 1 >= r.stops.length
-          ? { ...t, phase: "done" }
-          : { ...t, step: t.step + 1, phase: "walking" };
+          ? { ...t, phase: "done", pausedFrom: undefined }
+          : { ...t, step: t.step + 1, phase: "walking", pausedFrom: undefined };
       }),
-    pause: () => setState((t) => ({ ...t, phase: "paused" })),
-    resume: () => setState((t) => ({ ...t, phase: "walking" })),
+    /** Suspends the tour in place, keeping route, step and the mode to return to. */
+    pause: () =>
+      setState((t) =>
+        t.phase === "walking" || t.phase === "listening"
+          ? { ...t, phase: "paused", pausedFrom: t.phase }
+          : t,
+      ),
+    resume: () =>
+      setState((t) =>
+        t.phase === "paused"
+          ? { ...t, phase: t.pausedFrom ?? "walking", pausedFrom: undefined }
+          : t,
+      ),
+    /** Re-suspends a resumed tour without losing the checkpoint. */
+    suspend: () =>
+      setState((t) =>
+        t.phase === "walking" || t.phase === "listening"
+          ? { ...t, phase: "paused", pausedFrom: t.phase }
+          : t,
+      ),
     stop: () => setState(initial),
   };
 }

@@ -8,10 +8,13 @@ export const artworks: Artwork[] = [
     year: "2025",
     medium: "生成艺术 / 数字微喷",
     color: "#a7c4ac",
+    size: { width: 150, height: 190 },
     position: { x: -5.4, z: -4 },
     facing: Math.PI / 2,
     description:
       "山并非静止的风景，而是时间缓慢折叠后的形状。艺术家将地形数据转译成层叠的色域，让记忆在虚实之间生长。",
+    composition: "纵向叠压的色带山脊，地平线逐层抬高，视线被引向画面上方。",
+    themes: ["记忆", "时间", "自然"],
     transcript: [
       "请在这幅作品前稍作停留。层层叠叠的山脊，来自艺术家对故乡的记忆。",
       "画面中的每一条曲线，都是数据与情感的一次相遇。",
@@ -27,10 +30,13 @@ export const artworks: Artwork[] = [
     year: "2024",
     medium: "算法绘画 / 光场",
     color: "#b9b6d6",
+    size: { width: 220, height: 124 },
     position: { x: 0, z: -7.4 },
     facing: 0,
     description:
       "海浪被拆解为无数细小的光线，涨落不再有声音，只留下颜色的呼吸。这是一段关于消逝与重返的观察。",
+    composition: "横向细线铺满整幅，运动从左向右逐渐消解，形成潮水的呼吸。",
+    themes: ["时间", "消逝", "自然"],
     transcript: [
       "这里的海没有声音。",
       "艺术家捕捉了潮水退去后留下的纹理，将它们化成紫色的光。",
@@ -46,10 +52,13 @@ export const artworks: Artwork[] = [
     year: "2025",
     medium: "数字构成 / 色彩研究",
     color: "#e1a474",
+    size: { width: 110, height: 110 },
     position: { x: 5.4, z: -4 },
     facing: -Math.PI / 2,
     description:
       "午后的光被截取、平移、重新排列。几何之间的空白，让日常的温度成为可观看的结构。",
+    composition: "矩形块面切割画面，留白承担重心，边界清晰而克制。",
+    themes: ["时间", "光", "日常"],
     transcript: [
       "这件作品记录了一整个下午的阳光。",
       "暖色的块面是时间留下的切片，边缘的阴影则标记着移动。",
@@ -65,14 +74,18 @@ export const artworks: Artwork[] = [
     year: "2023",
     medium: "程序生成 / 建筑幻想",
     color: "#85b9c1",
+    size: { width: 160, height: 200 },
     position: { x: -5.4, z: 2.5 },
     facing: Math.PI / 2,
     description:
       "城市被从地表轻轻托起，建筑像群岛一样悬浮。失去重力后，我们如何重新理解彼此的距离？",
+    composition: "垂直建筑群高密度堆叠，群岛式分布让重心分散在画面上半部。",
+    themes: ["空间", "距离", "城市"],
     transcript: [
       "欢迎来到一座没有地面的城市。",
       "建筑以不可能的方式相连，像记忆中不断重写的街道。",
       "在这里，距离不再由地图决定。",
+      "也许，我们正在把彼此的距离，重新丈量一遍。",
     ],
     duration: 45,
   },
@@ -84,10 +97,13 @@ export const artworks: Artwork[] = [
     year: "2024",
     medium: "粒子艺术 / 数字绘画",
     color: "#9ba46a",
+    size: { width: 180, height: 120 },
     position: { x: 5.4, z: 2.5 },
     facing: -Math.PI / 2,
     description:
       "微小的光点在黑暗中聚集，形成介于植物与星系之间的生命。生长不需要被看见，却一直发生。",
+    composition: "中心椭圆粒子场，密度向边缘衰减，暗部占据大部分画面。",
+    themes: ["偶然", "秩序", "生命", "光"],
     transcript: [
       "把视线放慢，你会看到黑暗也在生长。",
       "每一个光点都遵循简单的规则，而它们共同形成了复杂的生命。",
@@ -103,14 +119,18 @@ export const artworks: Artwork[] = [
     year: "2025",
     medium: "三维雕塑 / 形态实验",
     color: "#d5c6b4",
+    size: { width: 130, height: 185 },
     position: { x: 0, z: 5.5 },
     facing: Math.PI,
     description:
       "重复的圆环并不通向同一个终点。虚拟雕塑以不可能的空间关系，邀请你重新感受时间的流向。",
+    composition: "同心椭圆环彼此穿插，环轴略有偏移，形成回望式的旋转。",
+    themes: ["时间", "空间", "循环"],
     transcript: [
       "时间能被装进一个容器吗？",
       "这些圆环彼此穿过，却始终保留独立的方向。",
       "绕行，停留，或者回望，都可以成为你理解这件作品的方式。",
+      "如果时间有形状，它大概是一只不断打开的盒子。",
     ],
     duration: 48,
   },
